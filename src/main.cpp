@@ -9,6 +9,9 @@ int main() {
     BigInt A(a, 3, BigInt::Negative);
     vector<digit_t> num = { 1, 5, 6, 8 };
     BigInt B(num, 4, BigInt::Negative);
-    cout << (A + B).as_string() << endl;
+    BigInt C = B - A;
+    cout << C + A + A << endl;
+    cout << A << " + " << B << " = " << A + B << endl;
+    cout << A << " - " << B << " = " << A - B << endl;
     return 0;
 }

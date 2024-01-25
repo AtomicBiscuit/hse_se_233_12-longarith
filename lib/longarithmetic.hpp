@@ -34,6 +34,12 @@ public:
 
     friend BigInt operator+(const BigInt&, const BigInt&);
 
+    friend BigInt operator-(const BigInt&);
+
+    friend BigInt operator-(const BigInt&, const BigInt&);
+
+    friend ostream& operator<<(ostream&, const BigInt&);
+
     friend bool operator>(const BigInt&, const BigInt&);
 
     friend bool greater_with_absolute(const BigInt&, const BigInt&);

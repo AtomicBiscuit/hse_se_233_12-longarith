@@ -1,5 +1,4 @@
 #include <deque>
-#include <iostream>
 #include <vector>
 #include <string>
 #include <cstdint>
@@ -37,6 +36,12 @@ public:
 
     friend BigInt operator+(const BigInt&, const BigInt&);
 
+    friend BigInt operator-(const BigInt&);
+
+    friend BigInt operator-(const BigInt&, const BigInt&);
+
+    friend ostream& operator<<(ostream&, const BigInt&);
+
     friend bool operator>(const BigInt&, const BigInt&);
 
     friend bool greater_with_absolute(const BigInt&, const BigInt&);
@@ -45,7 +50,6 @@ public:
 BigInt::BigInt() :digits({ 0 }), _size(1), _sign(Positive) {}
 
 BigInt::BigInt(const vector<digit_t>& dig, const uint32_t size, const uint8_t sign) {
-    cout << "check: dig = " << dig.size() << ", vector(dig) = " << vector<digit_t>(dig).size() << endl;
     this->digits = vector<digit_t>(dig);
     this->_size = size;
     this->_sign = sign;
@@ -115,6 +119,24 @@ BigInt operator+(const BigInt& lh, const BigInt& rh) {
     } else {
         return _add(rh, lh);
     }
+}
+
+BigInt operator-(const BigInt& obj) {
+    BigInt temp = BigInt(obj);
+    temp._sign = (temp._sign == BigInt::Positive ? BigInt::Negative : BigInt::Positive);
+    return temp;
+}
+
+BigInt operator-(const BigInt& lh, const BigInt& rh) {
+    if (greater_with_absolute(lh, rh)) {
+        return _add(lh, -rh);
+    } else {
+        return _add(-rh, lh);
+    }
+}
+
+ostream& operator<<(ostream& _os, const BigInt& obj) {
+    return _os << obj.as_string();
 }
 
 bool greater_with_absolute(const BigInt& lh, const BigInt& rh) {
