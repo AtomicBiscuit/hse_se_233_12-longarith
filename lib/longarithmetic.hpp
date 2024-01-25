@@ -32,13 +32,25 @@ public:
 
     string as_string() const;
 
+    BigInt& shift(int32_t);
+
+    void clear();
+
     friend BigInt operator+(const BigInt&, const BigInt&);
 
     friend BigInt operator-(const BigInt&);
 
     friend BigInt operator-(const BigInt&, const BigInt&);
 
+    friend BigInt operator*(const BigInt&, const BigInt&);
+
+    friend BigInt operator*(const BigInt&, const uint8_t&);
+
+    friend BigInt operator/(const BigInt&, const BigInt&);
+
     friend ostream& operator<<(ostream&, const BigInt&);
+
+    BigInt& operator=(const BigInt&);
 
     friend bool operator>(const BigInt&, const BigInt&);
 

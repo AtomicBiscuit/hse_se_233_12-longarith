@@ -34,13 +34,25 @@ public:
 
     string as_string() const;
 
+    BigInt& shift(int32_t);
+
+    void clear();
+
     friend BigInt operator+(const BigInt&, const BigInt&);
 
     friend BigInt operator-(const BigInt&);
 
     friend BigInt operator-(const BigInt&, const BigInt&);
 
+    friend BigInt operator*(const BigInt&, const BigInt&);
+
+    friend BigInt operator*(const BigInt&, const uint8_t&);
+
+    friend BigInt operator/(const BigInt&, const BigInt&);
+
     friend ostream& operator<<(ostream&, const BigInt&);
+
+    BigInt& operator=(const BigInt&);
 
     friend bool operator>(const BigInt&, const BigInt&);
 
@@ -84,6 +96,34 @@ string BigInt::as_string() const {
     return s;
 }
 
+BigInt& BigInt::shift(int32_t count) {
+    if (count == 0) {
+        return *this;
+    }
+    if (count > 0) {
+        this->_size += count;
+        if (this->_size > BigInt::MAX_SIZE) {
+            throw length_error("Number is too big");
+        }
+        this->digits.insert(this->digits.end(), count, 0);
+    } else {
+        if (this->_size <= abs(count)) {
+            this->clear();
+            return *this;
+        }
+        this->_size -= count;
+        this->digits = vector<digit_t>(this->digits.rend(), this->digits.rend() + this->_size + 1);
+    }
+    return *this;
+}
+
+void BigInt::clear() {
+    this->_size = 1;
+    this->_sign = BigInt::Positive;
+    this->digits.clear();
+    this->digits.push_back(0);
+}
+
 BigInt _add(const BigInt& lh, const BigInt& rh) {
     int8_t sign1 = lh._sign == BigInt::Positive ? 1 : -1;
     int8_t sign2 = rh._sign == BigInt::Positive ? 1 : -1;
@@ -100,7 +140,11 @@ BigInt _add(const BigInt& lh, const BigInt& rh) {
         }
         r = sum % 10;
         result[size - i - 1] = (r * sign1 >= 0 ? abs(r) : 10 - abs(r));
-        sum /= 10;
+        if (r * sign1 < 0) {
+            sum = sign1 * -1;
+        } else {
+            sum = sum / 10;
+        }
     }
     if (sum) {
         result.push_front(abs(sum));
@@ -109,6 +153,11 @@ BigInt _add(const BigInt& lh, const BigInt& rh) {
     while (size && result.front() == 0) {
         result.pop_front();
         --size;
+    }
+    if (size == 0) {
+        size = 1;
+        sign1 = 1;
+        result.push_back(0);
     }
     return BigInt(vector<digit_t>(result.begin(), result.end()), size, sign1 == 1 ? BigInt::Positive : BigInt::Negative);
 }
@@ -119,6 +168,46 @@ BigInt operator+(const BigInt& lh, const BigInt& rh) {
     } else {
         return _add(rh, lh);
     }
+}
+
+BigInt operator*(const BigInt& lh, const uint8_t& rh) {
+    if (rh >= 10) {
+        throw domain_error("numeric operand must be in [0, 9]");
+    }
+    if (rh == 0) {
+        return BigInt();
+    }
+    uint8_t sum = 0;
+    uint32_t size = lh._size;
+    deque<digit_t> result(size, 0);
+    for (int32_t i = 0; i < size; ++i) {
+        sum += lh.digits[size - i - 1] * rh;
+        result[size - i - 1] = sum % 10;
+        sum /= 10;
+    }
+    if (sum) {
+        result.push_front(sum);
+        size++;
+    }
+    return BigInt(vector<digit_t>(result.begin(), result.end()), size, lh._sign);
+}
+
+BigInt operator*(const BigInt& lh, const BigInt& rh) {
+    uint8_t sign = lh._sign == rh._sign ? BigInt::Positive : BigInt::Negative;
+    BigInt sum = BigInt();
+    sum._sign = lh._sign;
+    for (int32_t i = 0; i < rh._size; i++) {
+        sum = sum + (lh * rh.digits[rh._size - i - 1]).shift(i);
+    }
+    sum._sign = sign;
+    return sum;
+}
+
+BigInt& BigInt::operator=(const BigInt& rh) {
+    this->_sign = rh._sign;
+    this->_size = rh._size;
+    this->digits = rh.digits;
+    return *this;
 }
 
 BigInt operator-(const BigInt& obj) {
