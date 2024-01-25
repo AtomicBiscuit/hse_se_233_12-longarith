@@ -56,6 +56,8 @@ public:
 
     friend bool operator>(const BigInt&, const BigInt&);
 
+    friend bool operator==(const BigInt& lh, const BigInt& rh);
+
     friend bool greater_with_absolute(const BigInt&, const BigInt&);
 };
 
@@ -111,8 +113,8 @@ BigInt& BigInt::shift(int32_t count) {
             this->clear();
             return *this;
         }
-        this->_size -= count;
-        this->digits = vector<digit_t>(this->digits.rend(), this->digits.rend() + this->_size + 1);
+        this->_size += count;
+        this->digits = vector<digit_t>(this->digits.begin(), this->digits.begin() + this->_size + 1);
     }
     return *this;
 }
@@ -224,6 +226,34 @@ BigInt operator-(const BigInt& lh, const BigInt& rh) {
     }
 }
 
+BigInt operator/(const BigInt& lh, const BigInt& rh) {
+    if (rh._size > lh._size) {
+        return BigInt();
+    }
+    uint8_t sign = lh._sign == rh._sign ? BigInt::Positive : BigInt::Negative;
+    BigInt sum = BigInt();
+    BigInt addition = BigInt(vector<digit_t>(1, 1), 1, BigInt::Positive);
+    BigInt numerator(lh);
+    BigInt denominator(rh);
+    numerator._sign = BigInt::Positive;
+    denominator._sign = BigInt::Positive;
+    sum._sign = BigInt::Positive;
+    denominator.shift(lh._size - rh._size);
+    addition.shift(lh._size - rh._size);
+    while (denominator._size != 1 || denominator.digits[0] != 0) {
+        numerator = numerator - denominator;
+        if (numerator._sign == BigInt::Positive) {
+            sum = sum + addition;
+        } else {
+            numerator = numerator + denominator;
+            denominator.shift(-1);
+            addition.shift(-1);
+        }
+    }
+    sum._sign = sign;
+    return sum;
+}
+
 ostream& operator<<(ostream& _os, const BigInt& obj) {
     return _os << obj.as_string();
 }
@@ -270,4 +300,20 @@ bool operator>(const BigInt& lh, const BigInt& rh) {
         return false;
     }
     return bigger == lh._sign;
+}
+
+bool operator==(const BigInt& lh, const BigInt& rh) {
+    if (lh._sign != rh._sign) {
+        return false;
+    }
+    if (lh._size != rh._size) {
+        return false;
+    }
+    uint32_t size = lh._size;
+    for (uint32_t i = 0; i < size; ++i) {
+        if (lh.digits[i] != rh.digits[i]) {
+            return false;
+        }
+    }
+    return true;
 }

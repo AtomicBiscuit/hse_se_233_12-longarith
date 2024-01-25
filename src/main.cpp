@@ -1,17 +1,15 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include "../lib/longarithmetic.hpp"
 
 using namespace std;
 
 int main() {
-    vector<digit_t> a = { 9, 8, 4, 3, 5, 7, 1, 2, 3 };
-    BigInt A(a, 9, BigInt::Positive);
-    vector<digit_t> num = { 1, 5, 6, 8 };
-    BigInt B(num, 4, BigInt::Negative);
-    BigInt C = B - A;
-    cout << C + A + A << endl;
-    cout << A << " * " << B << " = " << B * A << endl;
-    cout << A << " - " << B << " = " << A - B << endl;
+    vector<digit_t> a = { 3,0,6,5,0,5,6,0,6,0,6,1,6,1,6,1,6,5,1 };
+    vector<digit_t> b = { 1,3,2,1,6,5,1,3,7,9 };
+    BigInt Sh(a, 18, BigInt::Negative);
+    BigInt A(b, 9, BigInt::Negative);
+    cout<< Sh / A << endl;
     return 0;
 }
