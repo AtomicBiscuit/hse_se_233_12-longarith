@@ -5,8 +5,6 @@
 #include <cstdint>
 #include "bigint.hpp"
 
-using namespace std;
-
 using digit_t = unsigned char;
 
 class BigFloat : BigInt {
@@ -17,7 +15,7 @@ public:
 
     BigFloat(const long double);
 
-    BigFloat(const vector<digit_t>&, const uint32_t, const  uint32_t, const uint8_t);
+    BigFloat(const std::vector<digit_t>&, const uint32_t, const  uint32_t, const uint8_t);
 
     BigFloat(const BigInt&);
 
@@ -29,7 +27,7 @@ public:
 
     const uint8_t sign() const;
 
-    string as_string() const;
+    std::string as_string() const;
 
     BigInt as_integer() const;
 
@@ -49,7 +47,7 @@ public:
 
     friend BigFloat operator/(const BigFloat&, const BigFloat&);
 
-    friend ostream& operator<<(ostream&, const BigFloat&);
+    friend std::ostream& operator<<(std::ostream&, const BigFloat&);
 
     BigFloat& operator=(const BigFloat&);
 

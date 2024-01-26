@@ -5,20 +5,18 @@
 #include <iostream>
 #include <cstdint>
 
-using namespace std;
-
 using digit_t = unsigned char;
 
 class BigInt {
 protected:
-    vector<digit_t> digits;
+    std::vector<digit_t> digits;
     uint32_t _size;
     uint8_t _sign;
     friend BigInt _add(const BigInt&, const BigInt&);
 public:
     BigInt();
 
-    BigInt(const vector<digit_t>&, const uint32_t, const uint8_t);
+    BigInt(const std::vector<digit_t>&, const uint32_t, const uint8_t);
 
     BigInt(const BigInt&);
 
@@ -30,9 +28,9 @@ public:
 
     const uint8_t sign() const;
 
-    const vector<digit_t>& as_array() const;
+    const std::vector<digit_t>& as_array() const;
 
-    string as_string() const;
+    std::string as_string() const;
 
     BigInt shift(const int32_t) const;
 
@@ -50,7 +48,7 @@ public:
 
     friend BigInt operator/(const BigInt&, const BigInt&);
 
-    friend ostream& operator<<(ostream&, const BigInt&);
+    friend std::ostream& operator<<(std::ostream&, const BigInt&);
 
     BigInt& operator=(const BigInt&);
 
