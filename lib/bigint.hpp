@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <string>
+#include <iostream>
 #include <cstdint>
 
 using namespace std;
@@ -8,7 +10,7 @@ using namespace std;
 using digit_t = unsigned char;
 
 class BigInt {
-private:
+protected:
     vector<digit_t> digits;
     uint32_t _size;
     uint8_t _sign;

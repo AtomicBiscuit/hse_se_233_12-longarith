@@ -10,7 +10,7 @@ using namespace std;
 using digit_t = unsigned char;
 
 class BigInt {
-private:
+protected:
     vector<digit_t> digits;
     uint32_t _size;
     uint8_t _sign;
@@ -230,16 +230,23 @@ BigInt operator/(const BigInt& lh, const BigInt& rh) {
     if (rh._size > lh._size) {
         return BigInt();
     }
+    if(rh._size == 1 && rh.digits[0] == 0){
+        return BigInt();
+    }
     uint8_t sign = lh._sign == rh._sign ? BigInt::Positive : BigInt::Negative;
+
     BigInt sum = BigInt();
     BigInt addition = BigInt(vector<digit_t>(1, 1), 1, BigInt::Positive);
     BigInt numerator(lh);
     BigInt denominator(rh);
+
     numerator._sign = BigInt::Positive;
     denominator._sign = BigInt::Positive;
     sum._sign = BigInt::Positive;
+
     denominator.shift(lh._size - rh._size);
     addition.shift(lh._size - rh._size);
+
     while (denominator._size != 1 || denominator.digits[0] != 0) {
         numerator = numerator - denominator;
         if (numerator._sign == BigInt::Positive) {
@@ -250,6 +257,7 @@ BigInt operator/(const BigInt& lh, const BigInt& rh) {
             addition.shift(-1);
         }
     }
+    
     sum._sign = sign;
     return sum;
 }
