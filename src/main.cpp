@@ -6,12 +6,9 @@
 using namespace std;
 
 int main() {
-    BigFloat precision(vector<digit_t>(1, 0), 1, 100, BigInt::Positive);
-    BigFloat one(vector<digit_t>(1, 1), 1, 0, BigInt::Positive);
-    BigFloat other = BigFloat();
-    for (int i = 0; i < 100; i++) {
-        cout << (other + precision).inversed() << endl;
-        other = other + one;
-    }
+    BigFloat zero = BigFloat(vector<digit_t>(1, 0), 1, 20, BigInt::Positive);
+    BigFloat a = 3.0_bf, b = 15.0_bf;
+    cout << b << " " << b / a << endl;
+    cout << 15.01_bf / 3.0_bf << endl;
     return 0;
 }

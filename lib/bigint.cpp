@@ -34,7 +34,7 @@ public:
 
     string as_string() const;
 
-    BigInt& shift(int32_t);
+    BigInt shift(const int32_t) const;
 
     void clear();
 
@@ -98,25 +98,26 @@ string BigInt::as_string() const {
     return s;
 }
 
-BigInt& BigInt::shift(int32_t count) {
+BigInt BigInt::shift(const int32_t count) const {
+    BigInt temp(*this);
     if (count == 0) {
-        return *this;
+        return temp;
     }
     if (count > 0) {
-        this->_size += count;
-        if (this->_size > BigInt::MAX_SIZE) {
+        temp._size += count;
+        if (temp._size > BigInt::MAX_SIZE) {
             throw length_error("Number is too big");
         }
-        this->digits.insert(this->digits.end(), count, 0);
+        temp.digits.insert(temp.digits.end(), count, 0);
     } else {
-        if (this->_size <= abs(count)) {
-            this->clear();
-            return *this;
+        if (temp._size <= abs(count)) {
+            temp.clear();
+            return temp;
         }
-        this->_size += count;
-        this->digits = vector<digit_t>(this->digits.begin(), this->digits.begin() + this->_size + 1);
+        temp._size += count;
+        temp.digits = vector<digit_t>(temp.digits.begin(), temp.digits.begin() + temp._size);
     }
-    return *this;
+    return temp;
 }
 
 void BigInt::clear() {
@@ -230,7 +231,7 @@ BigInt operator/(const BigInt& lh, const BigInt& rh) {
     if (rh._size > lh._size) {
         return BigInt();
     }
-    if(rh._size == 1 && rh.digits[0] == 0){
+    if (rh._size == 1 && rh.digits[0] == 0) {
         return BigInt();
     }
     uint8_t sign = lh._sign == rh._sign ? BigInt::Positive : BigInt::Negative;
@@ -244,8 +245,8 @@ BigInt operator/(const BigInt& lh, const BigInt& rh) {
     denominator._sign = BigInt::Positive;
     sum._sign = BigInt::Positive;
 
-    denominator.shift(lh._size - rh._size);
-    addition.shift(lh._size - rh._size);
+    denominator = denominator.shift(lh._size - rh._size);
+    addition = addition.shift(lh._size - rh._size);
 
     while (denominator._size != 1 || denominator.digits[0] != 0) {
         numerator = numerator - denominator;
@@ -253,11 +254,11 @@ BigInt operator/(const BigInt& lh, const BigInt& rh) {
             sum = sum + addition;
         } else {
             numerator = numerator + denominator;
-            denominator.shift(-1);
-            addition.shift(-1);
+            denominator = denominator.shift(-1);
+            addition = addition.shift(-1);
         }
     }
-    
+
     sum._sign = sign;
     return sum;
 }

@@ -34,7 +34,7 @@ public:
 
     string as_string() const;
 
-    BigInt& shift(int32_t);
+    BigInt shift(const int32_t) const;
 
     void clear();
 

@@ -7,19 +7,34 @@ protected:
     uint32_t _pre;
 public:
     BigFloat();
+
+    BigFloat(const long double);
+
     BigFloat(const vector<digit_t>&, const uint32_t, const  uint32_t, const uint8_t);
+
     BigFloat(const BigInt&);
+
     BigFloat(const BigFloat&);
 
     const uint32_t precision() const;
 
+    const uint32_t size() const;
+
+    const uint8_t sign() const;
+
     string as_string() const;
 
-    BigFloat inversed() const;
+    BigInt as_integer() const;
+
+    BigFloat shift(const int32_t) const;
+
+    BigFloat normalized(const BigFloat&) const;
 
     void clear();
 
     friend BigFloat operator+(const BigFloat&, const BigFloat&);
+
+    friend BigFloat operator-(const BigFloat&);
 
     friend BigFloat operator-(const BigFloat&, const BigFloat&);
 
@@ -33,10 +48,46 @@ public:
 
     friend bool operator>(const BigFloat&, const BigFloat&);
 
+    friend bool operator>=(const BigFloat&, const BigFloat&);
+
+    friend bool operator<(const BigFloat&, const BigFloat&);
+
+    friend bool operator<=(const BigFloat&, const BigFloat&);
+
     friend bool operator==(const BigFloat& lh, const BigFloat& rh);
 };
 
+BigFloat operator ""_bf(long double);
+
 BigFloat::BigFloat() : BigInt(), _pre(0) {}
+
+BigFloat::BigFloat(const long double val) {
+    this->_sign = val < 0 ? BigFloat::Negative : BigFloat::Positive;
+    string s_val = to_string(abs(val));
+    this->_size = 0;
+    this->_pre = 0;
+    this->digits = vector<digit_t>();
+    bool dot = false;
+    bool not_zero = false;
+    for (auto c : s_val) {
+        if (c == '.') {
+            dot = true;
+            continue;
+        } else if (c != '0') {
+            not_zero = true;
+        }
+        if (dot) {
+            ++this->_pre;
+        }
+        if (not_zero) {
+            ++this->_size;
+            this->digits.push_back(c - '0');
+        }
+    }
+    if (this->_size == 0) {
+        this->clear();
+    }
+}
 
 BigFloat::BigFloat(const vector<digit_t>& dig, const uint32_t size, const uint32_t pre, const uint8_t sign) :BigInt(dig, size, sign), _pre(pre) {}
 
@@ -58,6 +109,14 @@ const uint32_t BigFloat::precision() const {
     return this->_pre;
 }
 
+const uint32_t BigFloat::size() const {
+    return this->_size;
+}
+
+const uint8_t BigFloat::sign() const {
+    return this->_sign;
+}
+
 string BigFloat::as_string() const {
     string s1 = "";
     string s = s1.append((this->_pre > this->_size ? this->_pre - this->_size : 0), '0') + this->BigInt::as_string();
@@ -66,47 +125,65 @@ string BigFloat::as_string() const {
     return s;
 }
 
+BigInt BigFloat::as_integer() const {
+    return BigInt(this->digits, this->_size, this->_sign);
+}
+
 void BigFloat::clear() {
     this->BigInt::clear();
     this->_pre = 0;
 }
 
+BigFloat BigFloat::shift(const int32_t count) const {
+    BigFloat temp(this->as_integer().shift(count));
+    temp._pre = this->_pre;
+    return temp;
+}
+
+BigFloat BigFloat::normalized(const BigFloat& other) const {
+    BigInt temp = this->as_integer().shift(max(this->_pre, other._pre) - this->_pre);
+    BigFloat result(temp);
+    result._pre = max(this->_pre, other._pre) - this->_pre;
+    return result;
+}
+
 BigFloat operator+(const BigFloat& lh, const BigFloat& rh) {
-    BigInt L = BigFloat(lh).shift(max(lh._pre, rh._pre) - lh._pre);
-    BigInt R = BigFloat(rh).shift(max(lh._pre, rh._pre) - rh._pre);
+    BigInt L = lh.normalized(rh).as_integer();
+    BigInt R = rh.normalized(lh).as_integer();
     BigFloat result(L + R);
     result._pre = max(lh._pre, rh._pre);
     return result;
 }
 
+BigFloat operator-(const BigFloat& lh) {
+    BigFloat temp(lh);
+    temp._sign = temp._sign == BigFloat::Positive ? BigFloat::Negative : BigFloat::Positive;
+    return temp;
+}
+
 BigFloat operator-(const BigFloat& lh, const BigFloat& rh) {
-    BigInt L = BigFloat(lh).shift(max(lh._pre, rh._pre) - lh._pre);
-    BigInt R = BigFloat(rh).shift(max(lh._pre, rh._pre) - rh._pre);
+    BigInt L = lh.normalized(rh).as_integer();
+    BigInt R = rh.normalized(lh).as_integer();
     BigFloat result(L - R);
     result._pre = max(lh._pre, rh._pre);
     return result;
 }
 
 BigFloat operator*(const BigFloat& lh, const BigFloat& rh) {
-    BigInt L = BigFloat(lh).shift(max(lh._pre, rh._pre) - lh._pre);
-    BigInt R = BigFloat(rh).shift(max(lh._pre, rh._pre) - rh._pre);
+    BigInt L = lh.normalized(rh).as_integer();
+    BigInt R = rh.normalized(lh).as_integer();
     BigFloat result(L * R);
-    result._pre = lh._pre + rh._pre;
+    result._pre = max(lh._pre, rh._pre);
+    result = result.shift(-min(lh._pre, rh._pre));
     return result;
 }
 
-BigFloat BigFloat::inversed() const {
-    BigInt one(vector<digit_t>(1, 1), 1, BigInt::Positive);
-    one.shift(this->_pre * 2);
-    BigInt denominator = BigFloat(*this).shift(0);
-    BigFloat temp(one / denominator);
-    temp._pre = this->_pre;
-    return temp;
-}
-
 BigFloat operator/(const BigFloat& lh, const BigFloat& rh) {
-    BigFloat R = rh.inversed();
-    return lh * R;
+    BigInt L = lh.normalized(rh).as_integer().shift(max(lh._pre, rh._pre));
+    BigInt R = rh.normalized(lh).as_integer();
+    BigFloat res(L / R);
+    res._pre = max(lh._pre, rh._pre);
+    return res;
 }
 
 ostream& operator<<(ostream& _os, const BigFloat& obj) {
@@ -122,13 +199,29 @@ BigFloat& BigFloat::operator=(const BigFloat& rh) {
 }
 
 bool operator>(const BigFloat& lh, const BigFloat& rh) {
-    BigInt L = BigFloat(lh).shift(max(lh._pre, rh._pre));
-    BigInt R = BigFloat(rh).shift(max(lh._pre, rh._pre));
+    BigInt L = lh.normalized(rh);
+    BigInt R = rh.normalized(lh);
     return L > R;
 }
 
+bool operator>=(const BigFloat& lh, const BigFloat& rh) {
+    return lh > rh || lh == rh;
+}
+
+bool operator<(const BigFloat& lh, const BigFloat& rh) {
+    return rh > lh;
+}
+
+bool operator<=(const BigFloat& lh, const BigFloat& rh) {
+    return rh > lh || rh == lh;
+}
+
 bool operator==(const BigFloat& lh, const BigFloat& rh) {
-    BigInt L = BigFloat(lh).shift(max(lh._pre, rh._pre));
-    BigInt R = BigFloat(rh).shift(max(lh._pre, rh._pre));
+    BigInt L = lh.normalized(rh);
+    BigInt R = rh.normalized(lh);
     return L == R;
+}
+
+BigFloat operator""_bf(long double data) {
+    return BigFloat(data);
 }
