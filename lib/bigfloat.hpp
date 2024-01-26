@@ -65,3 +65,5 @@ public:
 };
 
 BigFloat operator ""_bf(long double);
+
+BigFloat operator""_bf(unsigned long long);

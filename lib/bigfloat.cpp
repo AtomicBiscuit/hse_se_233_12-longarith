@@ -10,6 +10,8 @@ public:
 
     BigFloat(const long double);
 
+    BigFloat(const unsigned long long);
+
     BigFloat(const vector<digit_t>&, const uint32_t, const  uint32_t, const uint8_t);
 
     BigFloat(const BigInt&);
@@ -83,6 +85,20 @@ BigFloat::BigFloat(const long double val) {
             ++this->_size;
             this->digits.push_back(c - '0');
         }
+    }
+    if (this->_size == 0) {
+        this->clear();
+    }
+}
+
+BigFloat::BigFloat(const unsigned long long val) {
+    this->_sign = BigFloat::Positive;
+    this->_pre = 0;
+    string s_val = to_string(val);
+    this->_size = s_val.size();
+    this->digits = vector<digit_t>(this->_size, 0);
+    for (int32_t i = 0; i < s_val.size(); i++) {
+        this->digits[i] = s_val[i] - '0';
     }
     if (this->_size == 0) {
         this->clear();
@@ -223,5 +239,9 @@ bool operator==(const BigFloat& lh, const BigFloat& rh) {
 }
 
 BigFloat operator""_bf(long double data) {
+    return BigFloat(data);
+}
+
+BigFloat operator""_bf(unsigned long long data) {
     return BigFloat(data);
 }
