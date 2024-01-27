@@ -22,9 +22,9 @@ public:
 
     enum eSign { Positive, Negative };
 
-    virtual const uint32_t size() const;
+    virtual uint32_t size() const;
 
-    virtual const uint8_t sign() const;
+    virtual uint8_t sign() const;
 
     virtual const std::vector<unsigned char> & as_array() const;
 

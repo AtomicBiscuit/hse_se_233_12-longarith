@@ -19,11 +19,11 @@ BigInt::BigInt(const std::vector<unsigned char>& dig, const uint32_t size, const
 
 BigInt::BigInt(const BigInt& obj) :_size(obj._size), _sign(obj._sign), digits(obj.digits) {}
 
-const uint32_t BigInt::size() const {
+uint32_t BigInt::size() const {
     return this->_size;
 }
 
-const uint8_t BigInt::sign() const {
+uint8_t BigInt::sign() const {
     return this->_sign;
 }
 
@@ -34,7 +34,7 @@ const std::vector<unsigned char>& BigInt::as_array() const {
 std::string BigInt::as_string() const {
     std::string s = this->_sign == BigInt::Positive ? "" : "-";
     for (auto element : this->digits) {
-        s.append(1, char(element) + '0');
+        s.append(1, static_cast<char>(element + '0'));
     }
     return s;
 }
@@ -69,10 +69,10 @@ void BigInt::clear() {
 }
 
 BigInt add(const BigInt& lh, const BigInt& rh) {
-    int8_t sign1 = lh._sign == BigInt::Positive ? 1 : -1;
-    int8_t sign2 = rh._sign == BigInt::Positive ? 1 : -1;
-    int8_t sum = 0;
-    int8_t r;
+    int32_t sign1 = lh._sign == BigInt::Positive ? 1 : -1;
+    int32_t sign2 = rh._sign == BigInt::Positive ? 1 : -1;
+    int32_t sum = 0;
+    int32_t r;
     uint32_t size = std::max(lh._size, rh._size);
     std::deque<unsigned char> result(size, 0);
     for (int32_t i = 0; i < size; ++i) {
@@ -103,7 +103,8 @@ BigInt add(const BigInt& lh, const BigInt& rh) {
         sign1 = 1;
         result.push_back(0);
     }
-    return BigInt(std::vector<unsigned char>(result.begin(), result.end()), size, sign1 == 1 ? BigInt::Positive : BigInt::Negative);
+    uint8_t sign = sign1 == 1 ? BigInt::Positive : BigInt::Negative;
+    return {std::vector<unsigned char>(result.begin(), result.end()), size, sign};
 }
 
 BigInt operator+(const BigInt& lh, const BigInt& rh) {
@@ -119,7 +120,7 @@ BigInt operator*(const BigInt& lh, const uint8_t& rh) {
         throw std::domain_error("numeric operand must be in [0, 9]");
     }
     if (rh == 0) {
-        return BigInt();
+        return {};
     }
     uint8_t sum = 0;
     uint32_t size = lh._size;
@@ -133,7 +134,7 @@ BigInt operator*(const BigInt& lh, const uint8_t& rh) {
         result.push_front(sum);
         size++;
     }
-    return BigInt(std::vector<unsigned char>(result.begin(), result.end()), size, lh._sign);
+    return {std::vector<unsigned char>(result.begin(), result.end()), size, lh._sign};
 }
 
 BigInt operator*(const BigInt& lh, const BigInt& rh) {
@@ -148,8 +149,8 @@ BigInt operator*(const BigInt& lh, const BigInt& rh) {
 }
 
 BigInt& BigInt::operator=(const BigInt& rh) {
-    this->_sign = rh._sign;
-    this->_size = rh._size;
+    this->_sign = rh.sign();
+    this->_size = rh.size();
     this->digits = rh.digits;
     return *this;
 }
@@ -170,24 +171,19 @@ BigInt operator-(const BigInt& lh, const BigInt& rh) {
 
 BigInt operator/(const BigInt& lh, const BigInt& rh) {
     if (rh._size > lh._size) {
-        return BigInt();
+        return {};
     }
     if (rh._size == 1 && rh.digits[0] == 0) {
-        return BigInt();
+        return {};
     }
-    uint8_t sign = lh._sign == rh._sign ? BigInt::Positive : BigInt::Negative;
 
     BigInt sum = BigInt();
     BigInt addition = BigInt(std::vector<unsigned char>(1, 1), 1, BigInt::Positive);
-    BigInt numerator(lh);
-    BigInt denominator(rh);
+    BigInt numerator(lh.as_array(), lh.size(), BigInt::Positive);
+    BigInt denominator(rh.as_array(), rh.size(), BigInt::Positive);
 
-    numerator._sign = BigInt::Positive;
-    denominator._sign = BigInt::Positive;
-    sum._sign = BigInt::Positive;
-
-    denominator = denominator.shift(lh._size - rh._size);
-    addition = addition.shift(lh._size - rh._size);
+    denominator = denominator.shift(static_cast<int32_t>(lh._size - rh._size));
+    addition = addition.shift(static_cast<int32_t>(lh._size - rh._size));
 
     while (denominator._size != 1 || denominator.digits[0] != 0) {
         numerator = numerator - denominator;
@@ -200,7 +196,7 @@ BigInt operator/(const BigInt& lh, const BigInt& rh) {
         }
     }
 
-    sum._sign = sign;
+    sum._sign = lh._sign == rh._sign ? BigInt::Positive : BigInt::Negative;
     return sum;
 }
 

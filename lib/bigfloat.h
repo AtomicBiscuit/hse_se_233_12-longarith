@@ -21,11 +21,11 @@ public:
 
     BigFloat(const BigFloat&);
 
-    const uint32_t precision() const;
+    uint32_t precision() const;
 
-    const uint32_t size() const;
+    uint32_t size() const;
 
-    const uint8_t sign() const;
+    uint8_t sign() const;
 
     std::string as_string() const;
 

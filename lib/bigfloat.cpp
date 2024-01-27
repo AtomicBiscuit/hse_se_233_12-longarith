@@ -50,27 +50,24 @@ BigInt(dig, size, sign), _pre(pre){}
 
 BigFloat::BigFloat(const BigInt& obj): BigInt(obj), _pre(0){}
 
-BigFloat::BigFloat(const BigFloat& obj) {
-    this->digits = obj.digits;
-    this->_size = obj._size;
+BigFloat::BigFloat(const BigFloat& obj)  : BigInt(obj) {
     this->_pre = obj._pre;
-    this->_sign = obj._sign;
 }
 
-const uint32_t BigFloat::precision() const {
+uint32_t BigFloat::precision() const {
     return this->_pre;
 }
 
-const uint32_t BigFloat::size() const {
+uint32_t BigFloat::size() const {
     return this->_size;
 }
 
-const uint8_t BigFloat::sign() const {
+uint8_t BigFloat::sign() const {
     return this->_sign;
 }
 
 std::string BigFloat::as_string() const {
-    std::string s1 = "";
+    std::string s1;
     std::string s = s1.append((this->_pre > this->_size ? this->_pre - this->_size : 0), '0') + this->BigInt::as_string();
     s.insert(s.end() - this->_pre, '.');
     return s;
@@ -81,8 +78,7 @@ const std::vector<unsigned char>& BigFloat::as_array() const {
 }
 
 BigInt BigFloat::as_integer() const {
-    BigInt temp = BigInt(this->digits, this->_size, this->_sign);
-    return temp;
+    return {this->digits, this->_size, this->_sign};
 }
 
 void BigFloat::clear() {
@@ -98,7 +94,7 @@ BigInt BigFloat::shift(int32_t count) const {
 }
 
 BigFloat BigFloat::normalized(const BigFloat& other) const {
-    return BigFloat(this->shift(std::max(this->_pre, other._pre) - this->_pre));
+    return BigFloat(this->shift(static_cast<int32_t>(std::max(this->_pre, other._pre) - this->_pre)));
 }
 
 BigFloat operator+(const BigFloat& lh, const BigFloat& rh) {
@@ -126,13 +122,13 @@ BigFloat operator-(const BigFloat& lh, const BigFloat& rh) {
 BigFloat operator*(const BigFloat& lh, const BigFloat& rh) {
     BigInt L = lh.normalized(rh).as_integer();
     BigInt R = rh.normalized(lh).as_integer();
-    BigFloat result((L * R).shift(-std::min(lh._pre, rh._pre)));
+    BigFloat result((L * R).shift(-1 * static_cast<int32_t>(std::min(lh._pre, rh._pre))));
     result._pre = std::max(lh._pre, rh._pre);
     return result;
 }
 
 BigFloat operator/(const BigFloat& lh, const BigFloat& rh) {
-    BigInt L = lh.normalized(rh).shift(std::max(lh._pre, rh._pre));
+    BigInt L = lh.normalized(rh).shift(static_cast<int32_t>(std::max(lh._pre, rh._pre)));
     BigInt R = rh.normalized(lh).as_integer();
     BigFloat res(L / R);
     res._pre = std::max(lh._pre, rh._pre);
