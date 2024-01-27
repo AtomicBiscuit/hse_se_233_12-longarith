@@ -124,8 +124,8 @@ BigFloat operator-(const BigFloat& lh, const BigFloat& rh) {
 }
 
 BigFloat operator*(const BigFloat& lh, const BigFloat& rh) {
-    BigInt L = lh.normalized(rh).as_integer();
-    BigInt R = rh.normalized(lh).as_integer();
+    BigInt L = lh.as_integer();
+    BigInt R = rh.as_integer();
     BigFloat result((L * R).shift(-std::min(lh._pre, rh._pre)));
     result._pre = std::max(lh._pre, rh._pre);
     return result;
