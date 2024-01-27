@@ -18,6 +18,8 @@ public:
 
     BigInt(const BigInt&);
 
+    BigInt(unsigned long long);
+
     static const uint32_t MAX_SIZE = 50000;
 
     enum eSign { Positive, Negative };
@@ -56,3 +58,5 @@ public:
 
     friend bool greater_with_absolute(const BigInt&, const BigInt&);
 };
+
+BigInt operator""_bi(unsigned long long);

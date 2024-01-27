@@ -19,6 +19,20 @@ BigInt::BigInt(const std::vector<unsigned char>& dig, const uint32_t size, const
 
 BigInt::BigInt(const BigInt& obj) :_size(obj._size), _sign(obj._sign), digits(obj.digits) {}
 
+BigInt::BigInt(const unsigned long long val){
+    this->_sign = BigInt::Positive;
+    std::string s_val = std::to_string(val);
+    this->_size = s_val.size();
+    this->digits = std::vector<unsigned char>(this->_size, 0);
+    for (int32_t i = 0; i < s_val.size(); i++) {
+        this->digits[i] = s_val[i] - '0';
+    }
+    if (this->_size == 0) {
+        this->_size = 1;
+        this->digits.push_back(0);
+    }
+}
+
 uint32_t BigInt::size() const {
     return this->_size;
 }
@@ -208,7 +222,6 @@ bool greater_with_absolute(const BigInt& lh, const BigInt& rh) {
     if (lh._size != rh._size) {
         return lh._size > rh._size;
     }
-    int8_t bigger = -1;
     uint32_t size = lh._size;
     for (int32_t i = 0; i < size; ++i) {
         if (lh.digits[i] > rh.digits[i]) {
@@ -262,4 +275,8 @@ bool operator==(const BigInt& lh, const BigInt& rh) {
         }
     }
     return true;
+}
+
+BigInt operator""_bi(unsigned long long data) {
+    return {data};
 }

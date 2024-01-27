@@ -62,6 +62,8 @@ public:
     friend bool operator<=(const BigFloat&, const BigFloat&);
 
     friend bool operator==(const BigFloat& lh, const BigFloat& rh);
+
+    friend bool operator!=(const BigFloat& lh, const BigFloat& rh);
 };
 
 BigFloat operator ""_bf(long double);

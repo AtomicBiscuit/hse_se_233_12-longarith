@@ -171,6 +171,10 @@ bool operator==(const BigFloat& lh, const BigFloat& rh) {
     return L == R;
 }
 
+bool operator!=(const BigFloat& lh, const BigFloat& rh) {
+    return not (lh == rh);
+}
+
 BigFloat operator""_bf(long double data) {
     return BigFloat(data);
 }
