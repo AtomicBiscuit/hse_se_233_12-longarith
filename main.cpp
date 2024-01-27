@@ -4,17 +4,17 @@
 
 void calc_pi(uint32_t precision) {
     BigFloat zero = BigFloat(std::vector<unsigned char>(1, 0), 1, precision, BigInt::Positive);
-    std::cout << "0";
+    std::cout << zero;
 }
 
 using std::cout;
 using std::endl;
 
 int main() {
-    std::cout << "How about calc Pi?" << std::endl;
-    std::cout << "1. Yes" << std::endl;
-    std::cout << "\"something else\". No, exit" << std::endl;
-    std::cout << "Your answer: ";
+    cout << "How about calc Pi?" << endl;
+    cout << "1. Yes" << endl;
+    cout << "(Any other answer). No, exit" << endl;
+    cout << "Your answer: ";
     std::string s;
     std::cin >> s;
     if (s == "1") {
