@@ -6,9 +6,9 @@
 #include <stdexcept>
 #include <cmath>
 
-BigInt::BigInt() :digits({ 0 }), _size(1), _sign(Positive) {}
+BigInt::BigInt() : digits({0}), _size(1), _sign(Positive) {}
 
-BigInt::BigInt(const std::vector<unsigned char>& dig, const uint32_t size, const uint8_t sign) {
+BigInt::BigInt(const std::vector<unsigned char> &dig, const uint32_t size, const uint8_t sign) {
     if (size > BigInt::MAX_SIZE) {
         throw std::length_error("Number is too big");
     }
@@ -17,9 +17,9 @@ BigInt::BigInt(const std::vector<unsigned char>& dig, const uint32_t size, const
     this->_sign = sign;
 }
 
-BigInt::BigInt(const BigInt& obj) :_size(obj._size), _sign(obj._sign), digits(obj.digits) {}
+BigInt::BigInt(const BigInt &obj) : _size(obj._size), _sign(obj._sign), digits(obj.digits) {}
 
-BigInt::BigInt(const unsigned long long val){
+BigInt::BigInt(const unsigned long long val) {
     this->_sign = BigInt::Positive;
     std::string s_val = std::to_string(val);
     this->_size = s_val.size();
@@ -41,13 +41,13 @@ uint8_t BigInt::sign() const {
     return this->_sign;
 }
 
-const std::vector<unsigned char>& BigInt::as_array() const {
+const std::vector<unsigned char> &BigInt::as_array() const {
     return this->digits;
 }
 
 std::string BigInt::as_string() const {
     std::string s = this->_sign == BigInt::Positive ? "" : "-";
-    for (auto element : this->digits) {
+    for (auto element: this->digits) {
         s.append(1, static_cast<char>(element + '0'));
     }
     return s;
@@ -82,7 +82,7 @@ void BigInt::clear() {
     this->digits.push_back(0);
 }
 
-BigInt add(const BigInt& lh, const BigInt& rh) {
+BigInt add(const BigInt &lh, const BigInt &rh) {
     int32_t sign1 = lh._sign == BigInt::Positive ? 1 : -1;
     int32_t sign2 = rh._sign == BigInt::Positive ? 1 : -1;
     int32_t sum = 0;
@@ -121,7 +121,7 @@ BigInt add(const BigInt& lh, const BigInt& rh) {
     return {std::vector<unsigned char>(result.begin(), result.end()), size, sign};
 }
 
-BigInt operator+(const BigInt& lh, const BigInt& rh) {
+BigInt operator+(const BigInt &lh, const BigInt &rh) {
     if (greater_with_absolute(lh, rh)) {
         return add(lh, rh);
     } else {
@@ -129,7 +129,7 @@ BigInt operator+(const BigInt& lh, const BigInt& rh) {
     }
 }
 
-BigInt operator*(const BigInt& lh, const uint8_t& rh) {
+BigInt operator*(const BigInt &lh, const uint8_t &rh) {
     if (rh >= 10) {
         throw std::domain_error("numeric operand must be in [0, 9]");
     }
@@ -151,7 +151,7 @@ BigInt operator*(const BigInt& lh, const uint8_t& rh) {
     return {std::vector<unsigned char>(result.begin(), result.end()), size, lh._sign};
 }
 
-BigInt operator*(const BigInt& lh, const BigInt& rh) {
+BigInt operator*(const BigInt &lh, const BigInt &rh) {
     uint8_t sign = lh._sign == rh._sign ? BigInt::Positive : BigInt::Negative;
     BigInt sum = BigInt();
     sum._sign = lh._sign;
@@ -162,20 +162,20 @@ BigInt operator*(const BigInt& lh, const BigInt& rh) {
     return sum;
 }
 
-BigInt& BigInt::operator=(const BigInt& rh) {
+BigInt &BigInt::operator=(const BigInt &rh) {
     this->_sign = rh.sign();
     this->_size = rh.size();
     this->digits = rh.digits;
     return *this;
 }
 
-BigInt operator-(const BigInt& obj) {
+BigInt operator-(const BigInt &obj) {
     BigInt temp = BigInt(obj);
     temp._sign = (temp._sign == BigInt::Positive ? BigInt::Negative : BigInt::Positive);
     return temp;
 }
 
-BigInt operator-(const BigInt& lh, const BigInt& rh) {
+BigInt operator-(const BigInt &lh, const BigInt &rh) {
     if (greater_with_absolute(lh, rh)) {
         return add(lh, -rh);
     } else {
@@ -183,7 +183,7 @@ BigInt operator-(const BigInt& lh, const BigInt& rh) {
     }
 }
 
-BigInt operator/(const BigInt& lh, const BigInt& rh) {
+BigInt operator/(const BigInt &lh, const BigInt &rh) {
     if (rh._size > lh._size) {
         return {};
     }
@@ -214,11 +214,11 @@ BigInt operator/(const BigInt& lh, const BigInt& rh) {
     return sum;
 }
 
-std::ostream& operator<<(std::ostream& _os, const BigInt& obj) {
+std::ostream &operator<<(std::ostream &_os, const BigInt &obj) {
     return _os << obj.as_string();
 }
 
-bool greater_with_absolute(const BigInt& lh, const BigInt& rh) {
+bool greater_with_absolute(const BigInt &lh, const BigInt &rh) {
     if (lh._size != rh._size) {
         return lh._size > rh._size;
     }
@@ -233,7 +233,7 @@ bool greater_with_absolute(const BigInt& lh, const BigInt& rh) {
     return false;
 }
 
-bool operator>(const BigInt& lh, const BigInt& rh) {
+bool operator>(const BigInt &lh, const BigInt &rh) {
     if (lh._sign != rh._sign) {
         return lh._sign == BigInt::Positive;
     }
@@ -261,7 +261,7 @@ bool operator>(const BigInt& lh, const BigInt& rh) {
     return bigger == lh._sign;
 }
 
-bool operator==(const BigInt& lh, const BigInt& rh) {
+bool operator==(const BigInt &lh, const BigInt &rh) {
     if (lh._sign != rh._sign) {
         return false;
     }
@@ -277,6 +277,6 @@ bool operator==(const BigInt& lh, const BigInt& rh) {
     return true;
 }
 
-BigInt operator""_bi(unsigned long long data) {
+BigInt operator ""_bi(unsigned long long data) {
     return {data};
 }

@@ -15,11 +15,11 @@ public:
 
     explicit BigFloat(unsigned long long);
 
-    BigFloat(const std::vector<unsigned char>&, uint32_t,  uint32_t, uint8_t);
+    BigFloat(const std::vector<unsigned char> &, uint32_t, uint32_t, uint8_t);
 
-    explicit BigFloat(const BigInt&);
+    explicit BigFloat(const BigInt &);
 
-    BigFloat(const BigFloat&);
+    BigFloat(const BigFloat &);
 
     uint32_t precision() const;
 
@@ -29,43 +29,43 @@ public:
 
     std::string as_string() const;
 
-    const std::vector<unsigned char>& as_array() const;
+    const std::vector<unsigned char> &as_array() const;
 
     BigInt as_integer() const;
 
     BigInt shift(int32_t) const;
 
-    BigFloat normalized(const BigFloat&) const;
+    BigFloat normalized(const BigFloat &) const;
 
     void clear();
 
-    friend BigFloat operator+(const BigFloat&, const BigFloat&);
+    friend BigFloat operator+(const BigFloat &, const BigFloat &);
 
-    friend BigFloat operator-(const BigFloat&);
+    friend BigFloat operator-(const BigFloat &);
 
-    friend BigFloat operator-(const BigFloat&, const BigFloat&);
+    friend BigFloat operator-(const BigFloat &, const BigFloat &);
 
-    friend BigFloat operator*(const BigFloat&, const BigFloat&);
+    friend BigFloat operator*(const BigFloat &, const BigFloat &);
 
-    friend BigFloat operator/(const BigFloat&, const BigFloat&);
+    friend BigFloat operator/(const BigFloat &, const BigFloat &);
 
-    friend std::ostream& operator<<(std::ostream&, const BigFloat&);
+    friend std::ostream &operator<<(std::ostream &, const BigFloat &);
 
-    BigFloat& operator=(const BigFloat&);
+    BigFloat &operator=(const BigFloat &);
 
-    friend bool operator>(const BigFloat&, const BigFloat&);
+    friend bool operator>(const BigFloat &, const BigFloat &);
 
-    friend bool operator>=(const BigFloat&, const BigFloat&);
+    friend bool operator>=(const BigFloat &, const BigFloat &);
 
-    friend bool operator<(const BigFloat&, const BigFloat&);
+    friend bool operator<(const BigFloat &, const BigFloat &);
 
-    friend bool operator<=(const BigFloat&, const BigFloat&);
+    friend bool operator<=(const BigFloat &, const BigFloat &);
 
-    friend bool operator==(const BigFloat& lh, const BigFloat& rh);
+    friend bool operator==(const BigFloat &lh, const BigFloat &rh);
 
-    friend bool operator!=(const BigFloat& lh, const BigFloat& rh);
+    friend bool operator!=(const BigFloat &lh, const BigFloat &rh);
 };
 
 BigFloat operator ""_bf(long double);
 
-BigFloat operator""_bf(unsigned long long);
+BigFloat operator ""_bf(unsigned long long);
