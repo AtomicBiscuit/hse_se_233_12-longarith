@@ -304,10 +304,26 @@ std::strong_ordering operator<=>(const BigFloat &lh, const BigFloat &rh) {
     return std::strong_ordering::less;
 }
 
+BigFloat BigFloat::power(const uint32_t &deg) const {
+    return ::power(*this, deg);
+}
+
 BigFloat operator ""_bf(long double data) {
     return BigFloat(data);
 }
 
 BigFloat operator ""_bf(unsigned long long data) {
     return BigFloat(data);
+}
+
+BigFloat power(const BigFloat &num, const uint32_t &deg) {
+    if (deg == 0) {
+        return 1_bf;
+    } else if (deg == 1) {
+        return num;
+    } else if (deg % 2 == 0) {
+        BigFloat tmp = power(num, deg / 2);
+        return tmp * tmp;
+    }
+    return num * power(num, deg - 1);
 }

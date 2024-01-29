@@ -25,7 +25,7 @@ public:
 
     BigFloat();
 
-    explicit BigFloat(long double);
+    [[deprecated("There are no guarantees of correct number conversion")]] explicit BigFloat(long double);
 
     explicit BigFloat(unsigned long long);
 
@@ -51,6 +51,8 @@ public:
 
     BigFloat abs() const;
 
+    BigFloat power(const uint32_t &) const;
+
     void clear();
 
     friend BigFloat operator+(const BigFloat &, const BigFloat &);
@@ -72,6 +74,8 @@ public:
     friend std::strong_ordering operator<=>(const BigFloat &lh, const BigFloat &rh);
 };
 
-BigFloat operator ""_bf(long double);
+[[deprecated("There are no guarantees of correct number conversion")]] BigFloat operator ""_bf(long double);
 
 BigFloat operator ""_bf(unsigned long long);
+
+BigFloat power(const BigFloat &, const uint32_t &);
