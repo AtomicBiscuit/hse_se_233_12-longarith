@@ -1,7 +1,6 @@
 #include "bigfloat.h"
 #include <cmath>
 #include <deque>
-#include <limits>
 #include <iostream>
 
 BigFloat::BigFloat() : digits({0}), _size(1), _sign(Positive), _pre(0) {}
@@ -9,6 +8,7 @@ BigFloat::BigFloat() : digits({0}), _size(1), _sign(Positive), _pre(0) {}
 BigFloat::BigFloat(const long double val) {
     this->_sign = val < 0 ? BigFloat::Negative : BigFloat::Positive;
     this->_size = 0;
+    this->_pre = 0;
     this->digits = std::vector<unsigned char>();
     long double _integral;
     long double fraction = modfl(fabsl(val), &_integral);
@@ -20,21 +20,20 @@ BigFloat::BigFloat(const long double val) {
         integral /= 10;
     }
     this->digits = std::vector<unsigned char>(temp.rbegin(), temp.rend());
-
-    if (this->_size < std::numeric_limits<long double>::digits10) {
-        this->_pre = std::numeric_limits<long double>::digits10 - this->_size;
-    } else {
-        this->_pre = 0;
-    }
-
-    unsigned char last = 0;
-    for (int32_t i = 0; i < this->_pre; i++) {
-        fraction -= last;
+    temp.clear();
+    for (int32_t i = 0; i < BigFloat::float_conversion_digits + 1; i++) {
         fraction *= 10;
-        last = static_cast<unsigned char>(floorl(fraction)) % 10;
-        this->digits.push_back(last);
-        this->_size++;
     }
+    auto frac =  static_cast<unsigned long long>(fraction + 0.1);
+    frac /= 10;
+    while (frac) {
+        temp.push_back(frac % 10);
+        frac /= 10;
+        this->_size++;
+        this->_pre++;
+    }
+
+    this->digits.insert(this->digits.end(), temp.rbegin(), temp.rend());
 }
 
 BigFloat::BigFloat(const unsigned long long val) {
@@ -271,15 +270,15 @@ BigFloat &BigFloat::operator=(const BigFloat &rh) {
     return *this;
 }
 
-std::strong_ordering operator<=>(const BigFloat &lh, const BigFloat &rh) {
-    if (lh._sign != rh._sign) {
-        if (lh._sign == BigFloat::Positive) {
+std::strong_ordering BigFloat::operator<=>(const BigFloat &rh) const {
+    if (this->_sign != rh._sign) {
+        if (this->_sign == BigFloat::Positive) {
             return std::strong_ordering::greater;
         }
         return std::strong_ordering::less;
     }
-    BigFloat L = lh.normalized(rh);
-    BigFloat R = rh.normalized(lh);
+    BigFloat L = this->normalized(rh);
+    BigFloat R = rh.normalized(*this);
     if (L._size > R._size) {
         return std::strong_ordering::greater;
     } else if (L._size < R._size) {
@@ -287,25 +286,57 @@ std::strong_ordering operator<=>(const BigFloat &lh, const BigFloat &rh) {
     }
     int8_t bigger = 0;
     for (uint32_t i = 0; i < L._size; ++i) {
-        if (lh.digits[i] > rh.digits[i]) {
+        if (this->digits[i] > rh.digits[i]) {
             bigger = BigFloat::Positive;
             break;
-        } else if (lh.digits[i] < rh.digits[i]) {
+        } else if (this->digits[i] < rh.digits[i]) {
             bigger = BigFloat::Negative;
             break;
         }
     }
     if (bigger == 0) {
-        return std::strong_ordering::equal;
+        return std::strong_ordering::equivalent;
     }
-    if (bigger == lh._sign) {
+    if (bigger == this->_sign) {
         return std::strong_ordering::greater;
     }
     return std::strong_ordering::less;
 }
 
+bool BigFloat::operator==(const BigFloat &rh) const {
+    if (this->_sign != rh._sign) {
+        return false;
+    }
+    BigFloat L = this->normalized(rh);
+    BigFloat R = rh.normalized(*this);
+    if (L._size != R._size) {
+        return false;
+    }
+    for (uint32_t i = 0; i < L._size; ++i) {
+        if (this->digits[i] != rh.digits[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 BigFloat BigFloat::power(const uint32_t &deg) const {
     return ::power(*this, deg);
+}
+
+BigFloat BigFloat::root(const uint32_t &deg) const {
+    return ::root(*this, deg);
+}
+
+BigFloat BigFloat::round(const uint32_t &precision) const {
+    if (precision >= this->_pre) {
+        return *this;
+    }
+    BigFloat tmp = this->shift(precision + 1).as_integer();
+    if(tmp.digits.back() >= 5){
+        tmp = tmp + 10_bf;
+    }
+    return {tmp.shift(-1).as_array(), std::max(1u, tmp._size - 1), precision, tmp._sign};
 }
 
 BigFloat operator ""_bf(long double data) {
@@ -326,4 +357,28 @@ BigFloat power(const BigFloat &num, const uint32_t &deg) {
         return tmp * tmp;
     }
     return num * power(num, deg - 1);
+}
+
+BigFloat root(const BigFloat &num, const uint32_t &deg) {
+    if (num.sign() == BigFloat::Negative && deg % 2 == 0) {
+        return {};
+    }
+    if (deg == 0) {
+        return 1_bf;
+    }
+    if (deg == 1) {
+        return num;
+    }
+    BigFloat A = num.abs();
+    BigFloat precision({0}, 1, num.precision() + 10, BigFloat::Positive);
+    BigFloat Xk = 1_bf + precision;
+    BigFloat prev = 1_bf;
+    BigFloat dec_deg = BigFloat(static_cast<unsigned long long>(deg - 1));
+    BigFloat inv_deg = (1_bf + precision) / BigFloat(static_cast<unsigned long long>(deg));
+    do {
+        prev = Xk;
+        Xk = inv_deg * (dec_deg * Xk + A / Xk.power(deg - 1));
+    } while (Xk != prev);
+    BigFloat answer = Xk.round(num.precision());
+    return {answer.as_array(), answer.size(), answer.precision(), num.sign()};
 }

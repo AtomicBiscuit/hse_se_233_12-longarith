@@ -7,6 +7,7 @@
 
 class BigFloat {
 private:
+    static const int32_t float_conversion_digits = 15;
     std::vector<unsigned char> digits;
     uint32_t _size;
     uint32_t _pre;
@@ -25,7 +26,7 @@ public:
 
     BigFloat();
 
-    [[deprecated("There are no guarantees of correct number conversion")]] explicit BigFloat(long double);
+    explicit BigFloat(long double);
 
     explicit BigFloat(unsigned long long);
 
@@ -51,7 +52,11 @@ public:
 
     BigFloat abs() const;
 
+    BigFloat round(const uint32_t &) const;
+
     BigFloat power(const uint32_t &) const;
+
+    BigFloat root(const uint32_t &) const;
 
     void clear();
 
@@ -71,11 +76,15 @@ public:
 
     BigFloat &operator=(const BigFloat &);
 
-    friend std::strong_ordering operator<=>(const BigFloat &lh, const BigFloat &rh);
+    std::strong_ordering operator<=>(const BigFloat &rh) const;
+
+    bool operator==(const BigFloat &rh) const;
 };
 
-[[deprecated("There are no guarantees of correct number conversion")]] BigFloat operator ""_bf(long double);
+BigFloat operator ""_bf(long double);
 
 BigFloat operator ""_bf(unsigned long long);
 
 BigFloat power(const BigFloat &, const uint32_t &);
+
+BigFloat root(const BigFloat &, const uint32_t &);
