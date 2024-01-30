@@ -11,22 +11,25 @@ using std::endl;
 void calc_pi(uint32_t precision) {
     std::clock_t c_start = std::clock();
     BigFloat zero = BigFloat(std::vector<unsigned char>(1, 0), 1, precision + 10, BigFloat::Positive);
-    BigFloat pi_raw = {};
-    BigFloat k = {}, sixteen_pow_k = 1_bf;
-    BigFloat num, den;
-    uint32_t i = precision + 1;
+    BigFloat eps = BigFloat(std::vector<unsigned char>(1, 1), 1, precision + 10, BigFloat::Positive);
+    BigFloat cnst = 426880_bf * (10005_bf + zero).root(2);
+    BigFloat cnst_a = (640320_bf + zero).power(3) / 24_bf;
+    BigFloat as = 1_bf + zero;
+    BigFloat bs = zero;
+    BigFloat ak = 1_bf + zero;
+    BigFloat k = 1_bf;
     do {
-        num = k * (k * 120_bf + 151_bf) + 47_bf;
-        den = k * (k * (k * (k * 512_bf + 1024_bf) + 712_bf) + 194_bf) + 15_bf;
-        pi_raw = pi_raw + num.shift(precision + 10) / (sixteen_pow_k * den);
-        sixteen_pow_k = sixteen_pow_k * 16_bf;
+        ak = -ak * ((k * 6_bf - 5_bf) * (k * 2_bf - 1_bf) * (k * 6_bf - 1_bf));
+        ak = ak / (k.power(3) * cnst_a);
+        as = as + ak;
+        bs = bs + k * ak;
         k = k + 1_bf;
-    } while (--i);
-    pi_raw = pi_raw.shift(-1 * (pi_raw.size() - precision - 1));
+    } while (ak.abs() >= eps);
+    BigFloat num = 13591409_bf * as + 545140134_bf * bs;
+    BigFloat pi = (cnst / num).round(precision);
     std::cout << "pi: " << endl;
-    BigFloat pi(pi_raw.as_array(), pi_raw.size(), precision, BigFloat::Positive);
     cout << pi << endl;
-    cout << "Time spend: " << 1000.0 * (std::clock() - c_start) / CLOCKS_PER_SEC << "ms" << endl;
+    cout << "Time spend: " << 1.0 * (std::clock() - c_start) / CLOCKS_PER_SEC << "s" << endl;
 }
 
 int main() {

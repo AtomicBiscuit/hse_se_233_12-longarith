@@ -175,7 +175,7 @@ BigFloat BigFloat::_pure_mul_dig(const BigFloat &lh, const uint8_t &rh) {
     if (rh == 0) {
         return {};
     }
-    int8_t sum = 0;
+    int32_t sum = 0;
     uint32_t size = lh._size;
     std::deque<unsigned char> result(size, 0);
     for (int32_t i = 0; i < size; ++i) {
@@ -187,13 +187,12 @@ BigFloat BigFloat::_pure_mul_dig(const BigFloat &lh, const uint8_t &rh) {
         result.push_front(sum);
         size++;
     }
-    return {std::vector<unsigned char>(result.begin(), result.end()), size, lh._pre, lh._sign};
+    return {std::vector<unsigned char>(result.begin(), result.end()), size, lh._pre, BigFloat::Positive};
 }
 
 BigFloat BigFloat::_pure_mul(const BigFloat &lh, const BigFloat &rh) {
     int8_t sign = lh._sign == rh._sign ? BigFloat::Positive : BigFloat::Negative;
     BigFloat sum{};
-    sum._sign = lh._sign;
     for (int32_t i = 0; i < rh._size; i++) {
         sum = sum + _pure_mul_dig(lh, rh.digits[rh._size - i - 1]).shift(i);
     }
