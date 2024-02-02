@@ -24,9 +24,9 @@ BigFloat::BigFloat(const long double val) {
     for (int32_t i = 0; i < BigFloat::float_conversion_digits + 1; i++) {
         fraction *= 10;
     }
-    auto frac =  static_cast<unsigned long long>(fraction + 0.1);
-    frac /= 10;
-    while (frac) {
+    auto frac = static_cast<unsigned long long>(fraction + 0.1) / 10;
+    uint32_t i = BigFloat::float_conversion_digits + 1;
+    while (--i) {
         temp.push_back(frac % 10);
         frac /= 10;
         this->_size++;
@@ -332,7 +332,7 @@ BigFloat BigFloat::round(const uint32_t &precision) const {
         return *this;
     }
     BigFloat tmp = this->shift(precision + 1).as_integer();
-    if(tmp.digits.back() >= 5){
+    if (tmp.digits.back() >= 5) {
         tmp = tmp + 10_bf;
     }
     return {tmp.shift(-1).as_array(), std::max(1u, tmp._size - 1), precision, tmp._sign};

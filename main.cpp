@@ -2,7 +2,6 @@
 #include <vector>
 #include <ctime>
 #include "bigfloat.h"
-#include <limits>
 
 
 using std::cout;
@@ -29,7 +28,7 @@ void calc_pi(uint32_t precision) {
     BigFloat pi = (cnst / num).round(precision);
     std::cout << "pi: " << endl;
     cout << pi << endl;
-    cout << "Time spend: " << 1.0 * (std::clock() - c_start) / CLOCKS_PER_SEC << "s" << endl;
+    cout << "Time spend: " << static_cast<double>(std::clock() - c_start) / CLOCKS_PER_SEC << "s" << endl;
 }
 
 int main() {

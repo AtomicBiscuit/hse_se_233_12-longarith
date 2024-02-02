@@ -11,7 +11,6 @@ add_executable(LongArithmetic main.cpp)
 
 target_link_libraries(LongArithmetic PUBLIC BigFloat)
 
-
 target_include_directories(LongArithmetic PUBLIC
         "${PROJECT_BINARY_DIR}"
         "${PROJECT_SOURCE_DIR}/lib"
