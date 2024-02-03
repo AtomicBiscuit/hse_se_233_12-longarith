@@ -10,8 +10,8 @@ using std::endl;
 
 void calc_pi(uint32_t precision) {
     std::clock_t c_start = std::clock();
-    BigFloat zero = BigFloat(std::vector<unsigned char>(1, 0), 1, precision + 10, BigFloat::Positive);
-    BigFloat eps = BigFloat(std::vector<unsigned char>(1, 1), 1, precision + 10, BigFloat::Positive);
+    BigFloat zero = BigFloat(0, precision + 10);
+    BigFloat eps = BigFloat(1, precision + 10);
     BigFloat cnst = 426880_bf * (10005_bf + zero).root(2);
     BigFloat cnst_a = (640320_bf + zero).power(3) / 24_bf;
     BigFloat as = 1_bf + zero;
@@ -27,7 +27,7 @@ void calc_pi(uint32_t precision) {
     } while (ak.abs() >= eps);
     BigFloat num = 13591409_bf * as + 545140134_bf * bs;
     BigFloat pi = (cnst / num).round(precision);
-    std::cout << "pi: " << endl;
+    std::cout << "PI with "<<pi.precision()<<" digits:" << endl;
     cout << pi << endl;
     cout << "Time spend: " << 1.0 * (std::clock() - c_start) / CLOCKS_PER_SEC << "s" << endl;
 }
