@@ -5,10 +5,16 @@
 #include <cstdint>
 #include <compare>
 
+using digit_t = uint64_t;
+using signed_digit_t = int64_t;
+
 class BigFloat {
 private:
-    static const int32_t float_conversion_digits = 15;
-    std::vector<unsigned char> digits;
+    static const int32_t float_conversion_digits = 8;
+    static const int32_t _base = 100000000;
+    static const int32_t _base_log10 = 8;
+
+    std::vector<digit_t> digits;
     uint32_t _size;
     uint32_t _pre;
     int8_t _sign;
@@ -17,7 +23,7 @@ private:
 
     static BigFloat _pure_mul(const BigFloat &, const BigFloat &);
 
-    static BigFloat _pure_mul_dig(const BigFloat &, const uint8_t &);
+    static BigFloat _pure_mul_dig(const BigFloat &, const digit_t &);
 
 public:
     enum eSign {
@@ -30,7 +36,9 @@ public:
 
     explicit BigFloat(unsigned long long);
 
-    BigFloat(const std::vector<unsigned char> &, uint32_t, uint32_t, int8_t);
+    BigFloat(long long, uint32_t);
+
+    BigFloat(const std::vector<digit_t> &, uint32_t, uint32_t, int8_t);
 
     BigFloat(const BigFloat &);
 
@@ -42,7 +50,7 @@ public:
 
     std::string as_string() const;
 
-    const std::vector<unsigned char> &as_array() const;
+    const std::vector<digit_t> &as_array() const;
 
     BigFloat as_integer() const;
 
@@ -58,6 +66,8 @@ public:
 
     BigFloat root(const uint32_t &) const;
 
+    BigFloat invert() const;
+
     void clear();
 
     friend BigFloat operator+(const BigFloat &, const BigFloat &);
@@ -67,8 +77,6 @@ public:
     friend BigFloat operator-(const BigFloat &, const BigFloat &);
 
     friend BigFloat operator*(const BigFloat &, const BigFloat &);
-
-    static BigFloat div(const BigFloat &, const BigFloat &);
 
     friend BigFloat operator/(const BigFloat &, const BigFloat &);
 
