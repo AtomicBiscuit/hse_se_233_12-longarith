@@ -13,9 +13,8 @@ jobs:
     - uses: actions/checkout@v3
     
     - name: Build
-      run: cmake ${{github.workspace}}/build
+      run: cmake .
 
     - name: Test
-      working-directory: ${{github.workspace}}/build
       run: make start_test
 
