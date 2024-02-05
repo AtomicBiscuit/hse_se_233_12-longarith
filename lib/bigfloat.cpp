@@ -19,7 +19,7 @@ BigFloat::BigFloat(const long long val, uint32_t precision) {
 BigFloat::BigFloat(const long double val) {
     this->_sign = val < 0 ? Negative : Positive;
     this->_size = 0;
-    this->_pre = float_conversion_digits / _base_log10;
+    this->_pre = (float_conversion_digits + _base_log10 - 1) / _base_log10;
     this->digits = std::vector<digit_t>();
     long double _integral;
     long double fraction = modfl(fabsl(val), &_integral);
@@ -38,7 +38,7 @@ BigFloat::BigFloat(const long double val) {
     }
     auto frac = static_cast<unsigned long long>(fraction + 1);
     frac /= 10;
-    int32_t i = float_conversion_digits / _base_log10;
+    auto i = static_cast<int32_t>(this->_pre);
     while (i--) {
         temp.push_back(frac % _base);
         frac /= _base;
@@ -220,7 +220,7 @@ BigFloat BigFloat::_pure_mul(const BigFloat &lh, const BigFloat &rh) {
     return sum.shift(-1 * static_cast<int32_t>(std::min(lh._pre, rh._pre)));
 }
 
-BigFloat BigFloat::invert() const{
+BigFloat BigFloat::invert() const {
     if (this->_size == 1 && this->digits[0] == 0) {
         return {};
     }
@@ -333,7 +333,7 @@ BigFloat BigFloat::round(const uint32_t &precision) const {
     if (convert_precision >= this->_pre) {
         return *this;
     }
-    BigFloat tmp = this->shift(convert_precision + 1).as_integer();
+    BigFloat tmp = this->shift(static_cast<int32_t>(convert_precision + 1)).as_integer();
     if (2 * tmp.digits.back() >= _base) {
         tmp = tmp + BigFloat(static_cast<unsigned long long>(_base));
     }
