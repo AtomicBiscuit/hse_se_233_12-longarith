@@ -5,13 +5,18 @@ project(LongArithmetic VERSION 1.9)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_subdirectory(lib)
+add_subdirectory("src")
 
-add_executable(LongArithmetic main.cpp)
+add_subdirectory("lib")
 
-target_link_libraries(LongArithmetic PUBLIC BigFloat)
+add_subdirectory("test")
 
-target_include_directories(LongArithmetic PUBLIC
-        "${PROJECT_BINARY_DIR}"
-        "${PROJECT_SOURCE_DIR}/lib"
+enable_testing()
+
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
 )
+
+FetchContent_MakeAvailable(googletest)
