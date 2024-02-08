@@ -110,3 +110,15 @@ TEST(MethodTestCase, invert_2) {
 TEST(MethodTestCase, invert_3) {
     EXPECT_EQ(0.01717842_bf, (3.8756_bf).power(3).invert());
 }
+
+TEST(MethodTestCase, clear_1) {
+    BigFloat zero = 7777.1111_bf;
+    zero.clear();
+    EXPECT_EQ(0_bf, zero);
+}
+
+TEST(MethodTestCase, clear_2) {
+    BigFloat zero = 7777_bf;
+    zero.clear();
+    EXPECT_EQ(0_bf, zero);
+}

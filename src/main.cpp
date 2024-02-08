@@ -15,7 +15,8 @@ int main() {
         cout << "Enter precision: ";
         uint32_t precision;
         std::cin >> precision;
-        calc_pi(precision);
+        long double time_spend = calc_pi(precision);
+        std::cout << "Time spend: " << time_spend << "s" << std::endl;
     } else {
         cout << "Bye" << endl;
     }

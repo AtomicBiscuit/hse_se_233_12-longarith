@@ -2,4 +2,4 @@
 
 #include <cstdint>
 
-void calc_pi(uint32_t precision);
+long double calc_pi(uint32_t precision);

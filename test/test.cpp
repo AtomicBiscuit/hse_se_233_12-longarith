@@ -5,3 +5,5 @@
 #include "cases/method.cpp"
 
 #include "cases/operator.cpp"
+
+#include "cases/pi_calc.cpp"
