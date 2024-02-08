@@ -3,6 +3,45 @@
 #include <deque>
 #include <iostream>
 
+namespace {
+    BigFloat root(const BigFloat &num, const uint32_t &deg) {
+        if (num.sign() == BigFloat::Negative && deg % 2 == 0) {
+            return {};
+        }
+        if (deg == 0) {
+            return 1_bf;
+        }
+        if (deg == 1) {
+            return num;
+        }
+        BigFloat A = num.abs();
+        BigFloat precision(0, num.precision() + 40 + deg);
+        BigFloat eps(1, num.precision() + 2);
+        BigFloat Xk = (10_bf).power((std::max(A.size(), A.precision()) - A.precision() + deg - 1) / deg) + precision;
+        BigFloat prev = 1_bf;
+        BigFloat dec_deg = BigFloat(static_cast<unsigned long long>(deg - 1));
+        BigFloat inv_deg = (1_bf + precision) / BigFloat(static_cast<unsigned long long>(deg));
+        do {
+            prev = Xk;
+            Xk = inv_deg * (dec_deg * Xk + A / Xk.power(deg - 1));
+        } while ((Xk - prev).abs() >= eps);
+        BigFloat answer = Xk.round(num.precision());
+        return answer.abs() * BigFloat(answer.sign(), 0);
+    }
+
+    BigFloat power(const BigFloat &num, const uint32_t &deg) {
+        if (deg == 0) {
+            return 1_bf;
+        } else if (deg == 1) {
+            return num;
+        } else if (deg % 2 == 0) {
+            BigFloat tmp = power(num, deg / 2);
+            return tmp * tmp;
+        }
+        return num * power(num, deg - 1);
+    }
+}
+
 BigFloat::BigFloat() : digits({0}), _size(1), _sign(Positive), _pre(0) {}
 
 BigFloat::BigFloat(const long long val, uint32_t precision) {
@@ -131,6 +170,7 @@ BigFloat BigFloat::shift(int32_t count) const {
     } else {
         if (temp._size <= std::abs(count)) {
             temp.clear();
+            temp._pre = this->_pre;
             return temp;
         }
         temp._size += count;
@@ -321,7 +361,12 @@ bool BigFloat::operator==(const BigFloat &rh) const {
 }
 
 BigFloat BigFloat::power(const uint32_t &deg) const {
-    return ::power(*this, deg);
+    if (deg == 0) {
+        return 1_bf + BigFloat(0, precision());
+    }
+    BigFloat temp = ::power(this->shift(static_cast<int32_t>(_pre)).as_integer(), deg);
+    temp = temp.shift(-1 * static_cast<int32_t>((deg > 0 ? deg - 1 : 0) * _pre));
+    return {temp.digits, temp._size, this->_pre, temp._sign};
 }
 
 BigFloat BigFloat::root(const uint32_t &deg) const {
@@ -346,41 +391,4 @@ BigFloat operator ""_bf(long double data) {
 
 BigFloat operator ""_bf(unsigned long long data) {
     return BigFloat(data);
-}
-
-BigFloat power(const BigFloat &num, const uint32_t &deg) {
-    if (deg == 0) {
-        return 1_bf;
-    } else if (deg == 1) {
-        return num;
-    } else if (deg % 2 == 0) {
-        BigFloat tmp = power(num, deg / 2);
-        return tmp * tmp;
-    }
-    return num * power(num, deg - 1);
-}
-
-BigFloat root(const BigFloat &num, const uint32_t &deg) {
-    if (num.sign() == BigFloat::Negative && deg % 2 == 0) {
-        return {};
-    }
-    if (deg == 0) {
-        return 1_bf;
-    }
-    if (deg == 1) {
-        return num;
-    }
-    BigFloat A = num.abs();
-    BigFloat precision(0, num.precision() + 10);
-    BigFloat eps(1, num.precision());
-    BigFloat Xk = 1_bf + precision;
-    BigFloat prev = 1_bf;
-    BigFloat dec_deg = BigFloat(static_cast<unsigned long long>(deg - 1));
-    BigFloat inv_deg = (1_bf + precision) / BigFloat(static_cast<unsigned long long>(deg));
-    do {
-        prev = Xk;
-        Xk = inv_deg * (dec_deg * Xk + A / Xk.power(deg - 1));
-    } while ((Xk - prev).abs() >= eps);
-    BigFloat answer = Xk.round(num.precision());
-    return answer.abs() * BigFloat(answer.sign(), 0);
 }

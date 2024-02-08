@@ -36,6 +36,14 @@ TEST(GettersCase, as_array_2) {
     EXPECT_EQ(answer, BigFloat(3.1415L).as_array());
 }
 
+TEST(GettersCase, as_integer_1) {
+    EXPECT_EQ(-BigFloat(928ull), BigFloat(-928.99L).as_integer());
+}
+
+TEST(GettersCase, as_integer_2) {
+    EXPECT_EQ(BigFloat(), BigFloat(0.5416L).as_integer());
+}
+
 TEST(GettersCase, precision_1) {
     EXPECT_EQ(0, BigFloat(0ull).precision());
 }

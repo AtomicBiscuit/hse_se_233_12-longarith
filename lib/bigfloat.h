@@ -92,7 +92,3 @@ public:
 BigFloat operator ""_bf(long double);
 
 BigFloat operator ""_bf(unsigned long long);
-
-BigFloat power(const BigFloat &, const uint32_t &);
-
-BigFloat root(const BigFloat &, const uint32_t &);
