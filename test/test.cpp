@@ -4,6 +4,9 @@
 
 #include "cases/method.cpp"
 
+#include "cases/comparator.cpp"
+
 #include "cases/operator.cpp"
 
 #include "cases/pi_calc.cpp"
+
