@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "bigfloat.h"
 
+using namespace longarithmetic;
 
 TEST(MethodTestCase, shift_1) {
     EXPECT_EQ(85274100000000_bf, BigFloat(852741ull).shift(1));

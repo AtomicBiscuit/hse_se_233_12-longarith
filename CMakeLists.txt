@@ -19,3 +19,5 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(googletest)
+
+add_custom_target(AllArithmetic COMMAND LongArithmeticTest COMMAND LongArithmetic)

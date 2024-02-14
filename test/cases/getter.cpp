@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "bigfloat.h"
 
+using namespace longarithmetic;
 
 TEST(GettersCase, as_string_1) {
     EXPECT_EQ("132.45600000", BigFloat(132.456L).as_string());

@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include "bigfloat.h"
 
+using namespace longarithmetic;
+
 TEST(ComparasionCase, greater_1) {
     EXPECT_GT(1_bf, -1_bf);
 }

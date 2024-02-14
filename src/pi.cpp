@@ -2,6 +2,8 @@
 #include <ctime>
 #include "bigfloat.h"
 
+using longarithmetic::BigFloat;
+
 long double calc_pi(uint32_t precision) {
     std::clock_t c_start = std::clock();
     BigFloat zero = BigFloat(0, precision + 10);
@@ -21,9 +23,7 @@ long double calc_pi(uint32_t precision) {
     } while (ak.abs() >= eps);
     BigFloat num = 13591409_bf * a_sum + 545140134_bf * b_sum;
     BigFloat pi = (cnst / num).round(precision);
-
     std::cout << "PI with " << precision << " digits:" << std::endl;
-
     std::string pi_string = pi.as_string();
     std::cout << std::string(pi_string.begin(), pi_string.begin() + precision + 2) << std::endl;
     return static_cast<double>(std::clock() - c_start) / CLOCKS_PER_SEC;

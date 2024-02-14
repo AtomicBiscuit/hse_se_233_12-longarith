@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include "bigfloat.h"
 
+using namespace longarithmetic;
+
 TEST(OperationsCase, addition_1) {
     EXPECT_EQ(100_bf, 53_bf + 43_bf + 3_bf + 1_bf);
 }

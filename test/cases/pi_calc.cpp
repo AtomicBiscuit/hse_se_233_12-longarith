@@ -2,6 +2,8 @@
 #include "pi.h"
 #include <iostream>
 
+using namespace longarithmetic;
+
 TEST(PiCalculationCase, hundred) {
     std::string answer = "PI with 100 digits:\n3.141592653589793238462643383279502884197169399375105820974944592307"
                          "8164062862089986280348253421170679\n";
